@@ -18,7 +18,7 @@ class KaaroUtils
         hwMacStringReady |= hardwareMacPtr[5];
 
         hwMacStringReady += 1;
-        Serial.println(hwMacStringReady);
+        // Serial.println(hwMacStringReady);
 
         return String(hwMacStringReady);
     }

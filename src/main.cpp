@@ -38,7 +38,7 @@ PubSubClient mqttClient(mqtt_server, 1883, mqttCallback, wifiClient);
 WiFiManager wifiManager;
 
 void printToSerial2(String payload){
-  while (Serial.available()) {
+  if(Serial.available()) {
     if(Serial.print(payload.c_str())){
   digitalWrite(LED, HIGH);   // turn the LED on (HIGH is the voltage level)
   delay(1000);                       // wait for a second
@@ -56,8 +56,8 @@ void mqttCallback(char *topic, uint8_t *payload, unsigned int length)
   free(cleanPayload);
 
   String topics = String(topic);
-  Serial.printf("From MQTT = ");
-  Serial.println(msg);
+  Serial2.printf("From MQTT = ");
+  Serial2.println(msg);
 
   // String countTopic = ROOT_MQ_ROOT + COUNT_MQ_STUB + DEVICE_MAC_ADDRESS;
 
@@ -89,14 +89,14 @@ void reconnect()
 
   if (!mqttClient.connected())
   {
-    Serial.print("Attempting MQTT connection...");
+    Serial2.print("Attempting MQTT connection...");
 
     String clientId = "ESP8266Client-";
     clientId += String(random(0xffff), HEX);
 
     if (mqttClient.connect(clientId.c_str()))
     {
-      Serial.println("connected");
+      Serial2.println("connected");
 
       String readyMessage = DEVICE_MAC_ADDRESS + " is Ready.";
       mqttClient.publish(readyTopic.c_str(), "Ready!");
@@ -115,9 +115,9 @@ void reconnect()
 
     else
     {
-      Serial.print("failed, rc=");
-      Serial.print(mqttClient.state());
-      Serial.println(" try again in 5 seconds");
+      Serial2.print("failed, rc=");
+      Serial2.print(mqttClient.state());
+      Serial2.println(" try again in 5 seconds");
 
       delay(5000);
     }
@@ -138,11 +138,11 @@ if (wifiManager.getWiFiIsSaved()){
 }
     if (WiFi.status() == WL_CONNECTED)
   {
-    Serial.println("");
-    Serial.println("WiFi connected");
-    Serial.println("IP address: ");
+    Serial2.println("");
+    Serial2.println("WiFi connected");
+    Serial2.println("IP address: ");
     IPAddress ip = WiFi.localIP();
-    Serial.println(ip);
+    Serial2.println(ip);
 
   }
 }
@@ -150,19 +150,20 @@ if (wifiManager.getWiFiIsSaved()){
 void setup() {
   // Note the format for setting a serial port is as follows: Serial2.begin(baud-rate, protocol, RX pin, TX pin);
   Serial.begin(115200);
+  Serial2.begin(9600);
   DEVICE_MAC_ADDRESS = KaaroUtils::getMacAddress();
   mqttSetTopicValues();
-  Serial.println(DEVICE_MAC_ADDRESS);
+  Serial2.println(DEVICE_MAC_ADDRESS);
 
-  Serial.println("Serial Txd is on pin: "+String(TX));
-  Serial.println("Serial Rxd is on pin: "+String(RX));
+  Serial2.println("Serial Txd is on pin: "+String(TX));
+  Serial2.println("Serial Rxd is on pin: "+String(RX));
   pinMode(LED,OUTPUT);
   digitalWrite(LED, HIGH);   
   delay(1000);                   
   digitalWrite(LED, LOW);    
   delay(1000); 
 
-  Serial.print("Connecting Wifi: ");
+  Serial2.print("Connecting Wifi: ");
   wifiManager.setConnectTimeout(5);
 
   wifiManager.setConfigPortalBlocking(false);
@@ -171,11 +172,11 @@ void setup() {
 
   if (WiFi.status() == WL_CONNECTED)
   {
-    Serial.println("");
-    Serial.println("WiFi connected");
-    Serial.println("IP address: ");
+    Serial2.println("");
+    Serial2.println("WiFi connected");
+    Serial2.println("IP address: ");
     IPAddress ip = WiFi.localIP();
-    Serial.println(ip);
+    Serial2.println(ip);
   }
   else{
     WiFiReconnect();
